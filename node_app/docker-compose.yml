@@ -1,18 +1,27 @@
 version: '3.8'
-
+networks:
+  network-db: 
+    driver: bridge
+    labels: 
+      - network-db
 services:
   mysql-db:
-    container_name: mysql_db
+    container_name: mysql-db
     image: mysql:8.3.0
     command: --default-authentication-plugin=mysql_native_password
-    restart: always
+    volumes:
+     - ./mysql-scripts/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     environment:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_ROOT_PASSWORD=123455
     ports:
-      - '3306:3306'
+      - 3306:3306
+    expose:
+      - 3306
+    networks:
+      - network-db
   node-app:
     build: 
       dockerfile: ./Dockerfile
@@ -25,7 +34,8 @@ services:
       - MYSQL_ROOT_PASSWORD=123455
       - MYSQL_HOST=mysql-db
     ports:
-      - '3000:8080'
-networks:
-  bridge:
-  host:
+      - "3000:8080/tcp"
+    expose:
+      - 8080
+    networks:
+    - network-db
