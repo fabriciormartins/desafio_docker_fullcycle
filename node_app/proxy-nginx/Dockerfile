@@ -6,5 +6,5 @@ RUN export DOCKERIZE_VERSION=v0.7.0 && apt-get update \
     && apt-get autoremove -yqq --purge wget && rm -rf /var/lib/apt/lists/*
 
 RUN pwd
-ENTRYPOINT dockerize -wait tcp://node_app:3000 && nginx -g 'daemon off;'
+ENTRYPOINT dockerize -wait http://node_app:3000 -timeout 45s && nginx -g 'daemon off;'
 EXPOSE 80 
